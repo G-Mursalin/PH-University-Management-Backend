@@ -1,101 +1,68 @@
-import { Request, Response } from 'express';
+import { NextFunction, Request, Response } from 'express';
+import httpStatus from 'http-status';
 import { studentServices } from './student.service';
-// import studentSchema from './student.joi.validation';
-import studentZodSchema from './student.validation';
+import sendResponse from '../../utils/sendResponse';
 
-const createStudent = async (req: Request, res: Response) => {
-  try {
-    const { student } = req.body;
-    // ********************Zod*********************************
-    const zodData = studentZodSchema.parse(student);
-
-    const result = await studentServices.createStudentToDB(zodData);
-
-    res.status(200).send({
-      success: true,
-      message: 'Student is created successfully',
-      data: result,
-    });
-    // // *****************Joi*******************************
-
-    // const { error, value } = studentSchema.validate(student);
-    // if (error) {
-    //   res.status(500).send({
-    //     success: false,
-    //     message: 'Something Went Wrong',
-    //     error: error.details,
-    //   });
-    // } else {
-    //   const result = await studentServices.createStudentToDB(value);
-    //   res.status(200).send({
-    //     success: true,
-    //     message: 'Student is created successfully',
-    //     data: result,
-    //   });
-    // }
-  } catch (error: any) {
-    res.status(500).send({
-      success: false,
-      message: error.message || 'Something Went Wrong',
-      error: error,
-    });
-  }
-};
-
-const getAllStudents = async (req: Request, res: Response) => {
+const getAllStudents = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const result = await studentServices.getAllStudentsFromDB();
 
-    res.status(200).send({
+    sendResponse(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: 'Students are retrieved successfully',
       data: result,
     });
-  } catch (error: any) {
-    res.status(500).send({
-      success: false,
-      message: error.message || 'Something Went Wrong',
-      error: error,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
-const getStudentByID = async (req: Request, res: Response) => {
+const getStudentByID = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
     const result = await studentServices.getStudentByIDFromDB(id);
 
-    res.status(200).send({
+    sendResponse(res, {
       success: true,
+      statusCode: httpStatus.OK,
       message: 'Student retrieved successfully',
       data: result,
     });
   } catch (error) {
-    console.log(error);
+    next(error);
   }
 };
 
-const deleteUserByID = async (req: Request, res: Response) => {
+const deleteUserByID = async (
+  req: Request,
+  res: Response,
+  next: NextFunction,
+) => {
   try {
     const { id } = req.params;
     const result = await studentServices.deleteStudentFromDB(id);
 
-    res.status(200).send({
+    sendResponse(res, {
       success: true,
-      message: 'Student deleted successfully',
+      statusCode: httpStatus.OK,
+      message: 'Students deleted successfully',
       data: result,
     });
-  } catch (error: any) {
-    res.status(500).send({
-      success: false,
-      message: error.message || 'Something Went Wrong',
-      error: error,
-    });
+  } catch (error) {
+    next(error);
   }
 };
 
 export const studentControllers = {
-  createStudent,
   getAllStudents,
   getStudentByID,
   deleteUserByID,
