@@ -77,11 +77,6 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 // *******************************************************************
 const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
   {
-    id: {
-      type: String,
-      required: [true, 'Student ID is required'],
-      unique: true,
-    },
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
@@ -97,7 +92,7 @@ const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
       },
       required: [true, 'Gender is required'],
     },
-    dateOfBirth: { type: String },
+    dateOfBirth: { type: Date },
     email: {
       type: String,
       required: [true, 'Email is required'],
@@ -135,7 +130,6 @@ const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
       required: [true, 'Local guardian information is required'],
     },
     profileImage: { type: String },
-    isDeleted: { type: Boolean, default: false },
   },
   {
     toJSON: {

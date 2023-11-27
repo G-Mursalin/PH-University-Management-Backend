@@ -15,7 +15,6 @@ const globalErrorHandler = (
     message: error.message || errorMessage,
     error: error,
   });
-  next();
 };
 
 export default globalErrorHandler;

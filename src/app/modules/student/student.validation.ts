@@ -1,7 +1,7 @@
 import { z } from 'zod';
 
 // Zod Schema
-const nameSchema = z.object({
+const nameValidationSchema = z.object({
   firstName: z
     .string()
     .refine(
@@ -22,7 +22,7 @@ const nameSchema = z.object({
     }),
 });
 
-const guardianSchema = z.object({
+const guardianValidationSchema = z.object({
   fatherName: z.string(),
   fatherOccupation: z.string(),
   fatherContactNo: z.string(),
@@ -31,32 +31,33 @@ const guardianSchema = z.object({
   motherContactNo: z.string(),
 });
 
-const localGuardianSchema = z.object({
+const localGuardianValidationSchema = z.object({
   name: z.string(),
   occupation: z.string(),
   contactNo: z.string(),
   address: z.string(),
 });
 
-const studentZodSchema = z.object({
-  id: z.string(),
-  password: z.string(),
-  name: nameSchema,
-  gender: z.enum(['male', 'female', 'others']),
-  dateOfBirth: z.string().optional(),
-  email: z.string().email(),
-  contactNo: z.string(),
-  emergencyContactNo: z.string(),
-  bloodGroup: z
-    .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
-    .optional(),
-  presentAddress: z.string(),
-  permanentAddress: z.string(),
-  guardian: guardianSchema,
-  localGuardian: localGuardianSchema,
-  profileImage: z.string().optional(),
-  isActive: z.enum(['active', 'blocked']).default('active'),
-  isDeleted: z.boolean().default(false),
+const createStudentValidationSchema = z.object({
+  body: z.object({
+    password: z.string().optional(),
+    student: z.object({
+      name: nameValidationSchema,
+      gender: z.enum(['male', 'female', 'others']),
+      dateOfBirth: z.date().optional(),
+      email: z.string().email(),
+      contactNo: z.string(),
+      emergencyContactNo: z.string(),
+      bloodGroup: z
+        .enum(['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'])
+        .optional(),
+      presentAddress: z.string(),
+      permanentAddress: z.string(),
+      guardian: guardianValidationSchema,
+      localGuardian: localGuardianValidationSchema,
+      profileImage: z.string().optional(),
+    }),
+  }),
 });
 
-export default studentZodSchema;
+export const studentValidators = { createStudentValidationSchema };
