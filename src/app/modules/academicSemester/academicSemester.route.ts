@@ -5,12 +5,22 @@ import { academicSemesterValidations } from './academicSemester.validation';
 
 const router = express.Router();
 
-router.post(
-  '/create-academic-semester',
-  validateRequest(
-    academicSemesterValidations.createAcademicSemesterValidationSchema,
-  ),
-  academicSemesterControllers.createAcademicSemester,
-);
+router
+  .post(
+    '/create-academic-semester',
+    validateRequest(
+      academicSemesterValidations.createAcademicSemesterValidationSchema,
+    ),
+    academicSemesterControllers.createAcademicSemester,
+  )
+  .get('/', academicSemesterControllers.getAllAcademicSemesters)
+  .get('/:id', academicSemesterControllers.getAcademicSemesterById)
+  .patch(
+    '/:id',
+    validateRequest(
+      academicSemesterValidations.updateAcademicSemesterValidationSchema,
+    ),
+    academicSemesterControllers.updateAcademicSemester,
+  );
 
 export const academicSemesterRoutes = router;

@@ -77,6 +77,11 @@ const localGuardianSchema = new Schema<TLocalGuardian>({
 // *******************************************************************
 const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
   {
+    id: {
+      type: String,
+      required: [true, 'ID is required'],
+      unique: true,
+    },
     user: {
       type: Schema.Types.ObjectId,
       required: [true, 'User id is required'],
@@ -130,6 +135,7 @@ const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
       required: [true, 'Local guardian information is required'],
     },
     profileImage: { type: String },
+    admissionSemester: { type: Schema.Types.ObjectId, ref: 'AcademicSemester' },
   },
   {
     toJSON: {

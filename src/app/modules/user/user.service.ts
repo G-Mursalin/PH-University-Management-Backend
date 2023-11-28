@@ -1,16 +1,23 @@
 import config from '../../config';
+import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
+import { AcademicSemester } from '../academicSemester/academicSemester.model';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
 import { TUser } from './user.interface';
-
 import { User } from './user.model';
+import { generateStudentID } from './user.utils';
 
 const createStudent = async (password: string, student: TStudent) => {
+  // Find Academic Semester Information
+  const admissionSemester = await AcademicSemester.findById(
+    student.admissionSemester,
+  );
+
   // Make user data
   const user: Partial<TUser> = {
     role: 'student',
     password: password || (config.default_password as string),
-    id: crypto.randomUUID(),
+    id: await generateStudentID(admissionSemester),
   };
 
   // Crate a user
