@@ -148,6 +148,39 @@ const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
   },
 );
 
+// ***Post document middleware**
+// studentSchema.post('save', function (doc, next) {
+//   doc.password = '';
+//   next();
+// });
+
+// //*** Query Middleware */
+// studentSchema.pre('find', function (next) {
+//   this.find({ isDeleted: { $ne: true } });
+//   next();
+// });
+// studentSchema.pre('findOne', function (next) {
+//   this.find({ isDeleted: { $ne: true } });
+//   next();
+// });
+
+//Pre Hook for Query Middleware
+// studentSchema.pre(/^find/, function (this: Query<IUser, Document>, next) {
+//   this.find({ isDeleted: { $ne: true } })
+//   next()
+// })
+
+// // **** Aggregation middleware
+// studentSchema.pre('aggregate', function (next) {
+//   this.pipeline().unshift({ $match: { isDeleted: { $ne: true } } });
+//   next();
+// });
+
+// ********************Virtual Fields
+// studentSchema.virtual('fullName').get(function () {
+//   return `${this.name.firstName} ${this.name.lastName}`;
+// });
+
 // Create a Model.
 export const Student = model<TStudent, StudentModelStaticMethod>(
   'Student',
