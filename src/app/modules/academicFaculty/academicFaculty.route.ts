@@ -15,6 +15,12 @@ router
   )
   .get('/', academicFacultyControllers.getAllAcademicFaculties)
   .get('/:id', academicFacultyControllers.getSingleAcademicFaculty)
-  .patch('/:id', academicFacultyControllers.updateAcademicFaculty);
+  .patch(
+    '/:id',
+    validateRequest(
+      academicFacultyValidators.updateAcademicFacultyValidationSchema,
+    ),
+    academicFacultyControllers.updateAcademicFaculty,
+  );
 
 export const academicFacultyRoutes = router;
