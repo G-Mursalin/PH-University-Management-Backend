@@ -2,6 +2,7 @@ import { TAcademicSemester } from '../academicSemester/academicSemester.interfac
 import { User } from './user.model';
 
 const findLastStudentId = async () => {
+  // Find the last inserted data to database
   const lastStudent = await User.findOne(
     {
       role: 'student',
@@ -16,11 +17,29 @@ const findLastStudentId = async () => {
     })
     .lean();
 
-  return lastStudent?.id ? lastStudent.id.substring(6) : undefined;
+  return lastStudent?.id ? lastStudent.id : undefined;
 };
 
 export const generateStudentID = async (payload: TAcademicSemester) => {
-  const currentId = (await findLastStudentId()) || (0).toString();
+  let currentId = (0).toString();
+
+  const lastStudentId = await findLastStudentId();
+
+  const lastStudentYear = lastStudentId?.substring(0, 4);
+
+  const lastStudentSemesterCode = lastStudentId?.substring(4, 6);
+
+  const currentYear = payload.year;
+
+  const currentSemesterCode = payload.code;
+
+  if (
+    lastStudentId &&
+    lastStudentSemesterCode === currentSemesterCode &&
+    lastStudentYear === currentYear
+  ) {
+    currentId = lastStudentId.substring(6);
+  }
 
   let incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
 
