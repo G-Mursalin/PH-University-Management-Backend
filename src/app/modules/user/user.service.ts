@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import mongoose from 'mongoose';
 import config from '../../config';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
@@ -18,6 +19,7 @@ const createStudent = async (password: string, student: TStudent) => {
   const session = await mongoose.startSession();
   try {
     session.startTransaction();
+
     // Make user data
     const user: Partial<TUser> = {
       role: 'student',
@@ -27,24 +29,33 @@ const createStudent = async (password: string, student: TStudent) => {
 
     // Crate a user (Transaction 1)
     const newUser = await User.create([user], { session });
-    if (!newUser.length)
+
+    if (!newUser.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Fail to create user');
+    }
 
     // Make student data
     student.id = newUser[0].id;
     student.user = newUser[0]._id;
-
+    // console.log(student);
     // Create a student (Transaction 2)
     const newStudent = await Student.create([student], { session });
-    if (!newStudent.length)
+
+    if (!newStudent.length) {
       throw new AppError(httpStatus.BAD_REQUEST, 'Fail to create student');
+    }
 
     await session.commitTransaction();
     await session.endSession();
+
     return newStudent[0];
-  } catch (error) {
+  } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
+    throw new AppError(
+      httpStatus.BAD_REQUEST,
+      error.message || 'Fail to create student',
+    );
   }
 };
 
