@@ -2,18 +2,17 @@ import { z } from 'zod';
 
 // Zod Schema
 const nameValidationSchema = z.object({
-  firstName: z
-    .string()
-    .refine(
-      (data) =>
-        data.trim().length > 0 &&
-        data.length <= 20 &&
-        /^[A-Z][a-z]*$/.test(data),
-      {
-        message:
-          'First name must be capitalized and have at most 20 characters',
-      },
-    ),
+  firstName: z.string(),
+  // .refine(
+  //   (data) =>
+  //     data.trim().length > 0 &&
+  //     data.length <= 20 &&
+  //     /^[A-Z][a-z]*$/.test(data),
+  //   {
+  //     message:
+  //       'First name must be capitalized and have at most 20 characters',
+  //   },
+  // ),
   middleName: z.string(),
   lastName: z
     .string()

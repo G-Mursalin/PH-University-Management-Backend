@@ -146,6 +146,7 @@ const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
     },
   },
   {
+    timestamps: true,
     toJSON: {
       virtuals: true,
     },

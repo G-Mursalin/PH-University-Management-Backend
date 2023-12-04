@@ -52,10 +52,8 @@ const createStudent = async (password: string, student: TStudent) => {
   } catch (error: any) {
     await session.abortTransaction();
     await session.endSession();
-    throw new AppError(
-      httpStatus.BAD_REQUEST,
-      error.message || 'Fail to create student',
-    );
+
+    throw error;
   }
 };
 
