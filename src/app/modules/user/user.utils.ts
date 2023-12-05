@@ -1,11 +1,10 @@
 import { TAcademicSemester } from '../academicSemester/academicSemester.interface';
 import { User } from './user.model';
 
-const findLastStudentId = async () => {
-  // Find the last inserted data to database
-  const lastStudent = await User.findOne(
+const findLastUserId = async (role: string) => {
+  const lastUser = await User.findOne(
     {
-      role: 'student',
+      role: role,
     },
     {
       id: 1,
@@ -17,13 +16,14 @@ const findLastStudentId = async () => {
     })
     .lean();
 
-  return lastStudent?.id ? lastStudent.id : undefined;
+  return lastUser?.id ? lastUser.id : undefined;
 };
 
+// Generate Student ID
 export const generateStudentID = async (payload: TAcademicSemester) => {
   let currentId = (0).toString();
 
-  const lastStudentId = await findLastStudentId();
+  const lastStudentId = await findLastUserId('student');
 
   const lastStudentYear = lastStudentId?.substring(0, 4);
 
@@ -44,6 +44,25 @@ export const generateStudentID = async (payload: TAcademicSemester) => {
   let incrementId = (Number(currentId) + 1).toString().padStart(4, '0');
 
   incrementId = `${payload.year}${payload.code}${incrementId}`;
+
+  return incrementId;
+};
+
+// Generate Faculty ID
+export const generateFacultyID = async () => {
+  const lastFacultyId = (await findLastUserId('faculty'))?.split('-')[1] || 0;
+
+  const incrementId =
+    'F-' + (Number(lastFacultyId) + 1).toString().padStart(4, '0');
+
+  return incrementId;
+};
+// Generate Faculty ID
+export const generateAdminID = async () => {
+  const lastAdminId = (await findLastUserId('admin'))?.split('-')[1] || 0;
+
+  const incrementId =
+    'A-' + (Number(lastAdminId) + 1).toString().padStart(4, '0');
 
   return incrementId;
 };
