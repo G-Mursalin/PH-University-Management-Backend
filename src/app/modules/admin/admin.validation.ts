@@ -44,5 +44,5 @@ const createAdminValidationSchema = z.object({
 });
 
 export const adminValidators = {
-  createFacultyValidationSchema: createAdminValidationSchema,
+  createAdminValidationSchema,
 };
