@@ -9,6 +9,7 @@ import {
   TUserName,
 } from './student.interface';
 import validator from 'validator';
+import { BloodGroup, Gender } from './student.constant';
 
 const nameSchema = new Schema<TUserName>({
   firstName: {
@@ -92,7 +93,7 @@ const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
     gender: {
       type: String,
       enum: {
-        values: ['male', 'female', 'others'],
+        values: Gender,
         message: '{VALUE} is not valid',
       },
       required: [true, 'Gender is required'],
@@ -116,7 +117,7 @@ const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
     },
     bloodGroup: {
       type: String,
-      enum: ['A+', 'A-', 'B+', 'B-', 'AB+', 'AB-', 'O+', 'O-'],
+      enum: BloodGroup,
     },
     presentAddress: {
       type: String,

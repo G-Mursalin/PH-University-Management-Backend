@@ -19,7 +19,7 @@ const getAllAdmins = async (query: Record<string, unknown>) => {
 };
 
 const getAdminByID = async (id: string) => {
-  const result = await Admin.findOne({ id });
+  const result = await Admin.findById(id);
 
   return result;
 };
@@ -37,7 +37,7 @@ const updateAdmin = async (id: string, payload: Partial<TAdmin>) => {
     }
   }
 
-  const result = await Admin.findOneAndUpdate({ id }, modifiedUpdatedData, {
+  const result = await Admin.findByIdAndUpdate(id, modifiedUpdatedData, {
     new: true,
     runValidators: true,
   });
@@ -49,16 +49,16 @@ const deleteAdminByID = async (id: string) => {
 
   try {
     session.startTransaction();
-    const deletedStudent = await Admin.findOneAndUpdate(
-      { id },
+    const deletedStudent = await Admin.findByIdAndUpdate(
+      id,
       { isDeleted: true },
       { new: true, session },
     );
     if (!deletedStudent) {
       throw new AppError(400, 'Fail to delete admin');
     }
-    const deletedUser = await User.findOneAndUpdate(
-      { id },
+    const deletedUser = await User.findByIdAndUpdate(
+      deletedStudent.user,
       { isDeleted: true },
       { new: true, session },
     );

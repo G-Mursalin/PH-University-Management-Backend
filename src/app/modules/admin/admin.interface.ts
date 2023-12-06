@@ -1,5 +1,22 @@
 import { Types } from 'mongoose';
 
+export type TGender = 'male' | 'female' | 'other';
+export type TBloodGroup =
+  | 'A+'
+  | 'A-'
+  | 'B+'
+  | 'B-'
+  | 'AB+'
+  | 'AB-'
+  | 'O+'
+  | 'O-';
+
+export type TUserName = {
+  firstName: string;
+  middleName: string;
+  lastName: string;
+};
+
 export type TAdminName = {
   firstName: string;
   middleName?: string;
@@ -11,12 +28,12 @@ export type TAdmin = {
   user: Types.ObjectId;
   designation: string;
   name: TAdminName;
-  gender: 'male' | 'female' | 'others';
+  gender: TGender;
   dateOfBirth?: string;
   email: string;
   contactNo: string;
   emergencyContactNo: string;
-  bloodGroup?: 'A+' | 'A-' | 'B+' | 'B-' | 'AB+' | 'AB-' | 'O+' | 'O-';
+  bloodGroup?: TBloodGroup;
   presentAddress: string;
   permanentAddress: string;
   profileImage?: string;
