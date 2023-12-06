@@ -77,6 +77,7 @@ const deleteFacultyByID = async (id: string) => {
   } catch (error) {
     await session.abortTransaction();
     await session.endSession();
+    throw error;
   }
 };
 
