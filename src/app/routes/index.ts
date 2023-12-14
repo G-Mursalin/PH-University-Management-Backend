@@ -1,3 +1,4 @@
+import { semesterRegistrationRoutes } from './../modules/semesterRegistration/semesterRegistration.route';
 import { Router } from 'express';
 import { studentRoutes } from '../modules/student/student.route';
 import { userRoutes } from '../modules/user/user.route';
@@ -11,14 +12,15 @@ import { courseRoutes } from '../modules/course/course.route';
 const router = Router();
 
 const moduleRoutes = [
-  { path: '/students', route: studentRoutes },
-  { path: '/users', route: userRoutes },
-  { path: '/academic-semesters', route: academicSemesterRoutes },
-  { path: '/academic-faculties', route: academicFacultyRoutes },
-  { path: '/academic-departments', route: academicDepartmentRoutes },
-  { path: '/faculties', route: facultiesRoutes },
-  { path: '/admins', route: adminRoutes },
-  { path: '/courses', route: courseRoutes },
+    { path: '/students', route: studentRoutes },
+    { path: '/users', route: userRoutes },
+    { path: '/academic-semesters', route: academicSemesterRoutes },
+    { path: '/academic-faculties', route: academicFacultyRoutes },
+    { path: '/academic-departments', route: academicDepartmentRoutes },
+    { path: '/faculties', route: facultiesRoutes },
+    { path: '/admins', route: adminRoutes },
+    { path: '/courses', route: courseRoutes },
+    { path: '/semester-registrations', route: semesterRegistrationRoutes },
 ];
 
 moduleRoutes.forEach((val) => router.use(val.path, val.route));
