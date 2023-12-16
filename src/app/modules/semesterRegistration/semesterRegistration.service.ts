@@ -5,12 +5,13 @@ import { TSemesterRegistrationRoutes } from './semesterRegistration.interface';
 import { SemesterRegistration } from './semesterRegistration.model';
 import QueryBuilder from '../../builder/QueryBuilder';
 import { RegistrationStatus } from './semesterRegistration.constant';
+import { OfferedCourse } from '../offeredCourse/offeredCourse.model';
+import mongoose from 'mongoose';
 
 const createSemesterRegistration = async (
     payload: TSemesterRegistrationRoutes,
 ) => {
     // Check if there is any semester registered that is "UPCOMING" or "ONGOING"
-
     const isThereAnyUpcomingOrOngoingSemester =
         await SemesterRegistration.findOne({
             $or: [
@@ -38,7 +39,7 @@ const createSemesterRegistration = async (
         );
     }
 
-    // Check is the semester is already registered
+    // Check is the academic semester is already registered
     const isSemesterRegistrationExists = await SemesterRegistration.findOne({
         academicSemester,
     });
@@ -57,7 +58,7 @@ const createSemesterRegistration = async (
 };
 
 const getAllSemesterRegistrations = async (query: Record<string, unknown>) => {
-    const facultyQuery = new QueryBuilder(
+    const semesterRegistrationQuey = new QueryBuilder(
         SemesterRegistration.find().populate('academicSemester'),
         query,
     )
@@ -66,7 +67,7 @@ const getAllSemesterRegistrations = async (query: Record<string, unknown>) => {
         .paginate()
         .fields();
 
-    const result = await facultyQuery.modelQuery;
+    const result = await semesterRegistrationQuey.modelQuery;
     return result;
 };
 
@@ -81,7 +82,7 @@ const updateSemesterRegistration = async (
     id: string,
     payload: Partial<TSemesterRegistrationRoutes>,
 ) => {
-    //    Check if the requested semester is exists
+    // Check if the requested semester is exists
     const isSemesterRegistrationExists =
         await SemesterRegistration.findById(id);
 
@@ -93,7 +94,6 @@ const updateSemesterRegistration = async (
     }
 
     //   If the requested semester registration is ended then we wii not update anything
-
     const currentSemesterStatus = isSemesterRegistrationExists.status;
     const requestedStatus = payload?.status;
 
@@ -104,9 +104,8 @@ const updateSemesterRegistration = async (
         );
     }
 
-    //Update logic:
-
-    // UPCOMING ==> ONGOING ==> ENDED
+    // UPCOMING ==> ONGOING ==> ENDED (We can only update this one direction)
+    // We can't update status UPCOMING to ENDED
     if (
         currentSemesterStatus === RegistrationStatus.UPCOMING &&
         requestedStatus === RegistrationStatus.ENDED
@@ -117,6 +116,7 @@ const updateSemesterRegistration = async (
         );
     }
 
+    // We can't update status ONGOING to UPCOMING
     if (
         currentSemesterStatus === RegistrationStatus.ONGOING &&
         requestedStatus === RegistrationStatus.UPCOMING
@@ -135,9 +135,70 @@ const updateSemesterRegistration = async (
     return result;
 };
 
+const deleteSemesterRegistration = async (id: string) => {
+    const isSemesterRegistrationExists =
+        await SemesterRegistration.findById(id);
+
+    if (!isSemesterRegistrationExists) {
+        throw new AppError(
+            httpStatus.NOT_FOUND,
+            'SemesterRegistration not found',
+        );
+    }
+
+    if (isSemesterRegistrationExists.status !== 'UPCOMING') {
+        throw new AppError(
+            httpStatus.NOT_FOUND,
+            `SemesterRegistration can not be deleted. Because this semesterRegistration is ${isSemesterRegistrationExists.status}`,
+        );
+    }
+
+    const session = await mongoose.startSession();
+    session.startTransaction();
+
+    try {
+        // Delete all OfferedCourse documents related to the semesterRegistration
+        const offeredCourses = await OfferedCourse.deleteMany(
+            { semesterRegistration: id },
+            { session },
+        );
+
+        if (!offeredCourses) {
+            throw new AppError(
+                httpStatus.BAD_REQUEST,
+                'Fail to delete SemesterRegistration',
+            );
+        }
+
+        // Delete SemesterRegistration
+        const result = await SemesterRegistration.findByIdAndDelete(id, {
+            new: true,
+            session,
+        });
+
+        if (!result) {
+            throw new AppError(
+                httpStatus.BAD_REQUEST,
+                'Fail to delete SemesterRegistration',
+            );
+        }
+
+        // Commit and end the transaction
+        await session.commitTransaction();
+        session.endSession();
+
+        return result;
+    } catch (error) {
+        // If an error occurs, rollback the transaction and end transaction
+        await session.abortTransaction();
+        session.endSession();
+    }
+};
+
 export const semesterRegistrationServices = {
     getAllSemesterRegistrations,
     getSemesterRegistrationByID,
     updateSemesterRegistration,
     createSemesterRegistration,
+    deleteSemesterRegistration,
 };

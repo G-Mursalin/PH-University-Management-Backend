@@ -21,6 +21,7 @@ router
             semesterRegistrationValidations.updateSemesterRegistrationValidationSchema,
         ),
         semesterRegistrationControllers.updateSemesterRegistration,
-    );
+    )
+    .delete('/:id', semesterRegistrationControllers.deleteSemesterRegistration);
 
 export const semesterRegistrationRoutes = router;
