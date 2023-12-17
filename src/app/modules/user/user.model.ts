@@ -10,7 +10,12 @@ const userSchema = new Schema<TUser, UserModel>(
             required: [true, 'Student ID is required'],
             unique: true,
         },
-        password: { type: String, required: [true, 'Password is required'] },
+        password: {
+            type: String,
+            required: [true, 'Password is required'],
+            select: 0,
+        },
+        passwordChangedAt: { type: Date },
         needsPasswordChange: { type: Boolean, default: true },
         isDeleted: { type: Boolean, default: false },
         status: {
@@ -48,7 +53,7 @@ userSchema.post('save', function (doc, next) {
 
 // Check if the user exist in database
 userSchema.statics.isUserExistsByCustomId = async function (id: string) {
-    return await User.findOne({ id });
+    return await User.findOne({ id }).select('+password');
 };
 
 //  Check Password is correct
@@ -57,6 +62,16 @@ userSchema.statics.isPasswordMatched = async function (
     passwordInDB: string,
 ) {
     return await bcrypt.compare(passwordFromReq, passwordInDB);
+};
+
+//
+userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
+    passwordChangedTimeStamp: Date,
+    jwtIssuedTimeStamp: number,
+) {
+    const passwordChangedTime =
+        new Date(passwordChangedTimeStamp).getTime() / 1000;
+    return passwordChangedTime > jwtIssuedTimeStamp;
 };
 
 // Create Model
