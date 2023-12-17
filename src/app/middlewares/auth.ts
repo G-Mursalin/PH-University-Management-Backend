@@ -24,9 +24,9 @@ const auth = (...requiredRoles: TUserRole[]) => {
             const decoded = jwt.verify(
                 token,
                 config.jwt_access_secret as string,
-            );
+            ) as JwtPayload;
 
-            const { role, userId, iat } = decoded as JwtPayload;
+            const { role, userId, iat } = decoded;
 
             const user = await User.isUserExistsByCustomId(userId);
 
