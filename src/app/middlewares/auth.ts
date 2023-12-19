@@ -58,13 +58,15 @@ const auth = (...requiredRoles: TUserRole[]) => {
                     'You are not authorize!',
                 );
             }
+
+            // Check if correct role base user accessing correct role base resources
             if (requiredRoles && !requiredRoles.includes(role)) {
                 throw new AppError(
                     httpStatus.UNAUTHORIZED,
                     'You are not authorize!',
                 );
             }
-            req.user = decoded as JwtPayload;
+            req.user = decoded;
             next();
         },
     );

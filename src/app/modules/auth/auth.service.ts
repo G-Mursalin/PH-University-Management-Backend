@@ -6,6 +6,7 @@ import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import config from '../../config';
 import { createToken } from './auth.utils';
+import { sendEmail } from '../../utils/sendEmail';
 
 const loginUser = async (payload: TLoginUser) => {
     const { id, password } = payload;
@@ -32,7 +33,7 @@ const loginUser = async (payload: TLoginUser) => {
         throw new AppError(httpStatus.FORBIDDEN, 'Invalid password!');
     }
 
-    // Assess Granted: Send Access Token, Refresh Token
+    // Access Granted: Send Access Token, Refresh Token
     const jwtPayload = { userId: user.id, role: user.role };
     const accessToken = createToken(
         jwtPayload,
@@ -156,8 +157,42 @@ const refreshToken = async (token: string) => {
     };
 };
 
+const forgetPassword = async (id: string) => {
+    const user = await User.isUserExistsByCustomId(id);
+
+    // Check if the user exist in database
+    if (!user) {
+        throw new AppError(httpStatus.NOT_FOUND, 'User is not found');
+    }
+
+    // Check if the user is already deleted
+    if (user.isDeleted) {
+        throw new AppError(httpStatus.FORBIDDEN, 'User is deleted');
+    }
+
+    // Check if the user is blocked
+    if (user.status === 'blocked') {
+        throw new AppError(httpStatus.FORBIDDEN, 'User is blocked');
+    }
+
+    // Create token
+    const jwtPayload = { userId: user.id, role: user.role };
+    const passwordResetToken = createToken(
+        jwtPayload,
+        config.jwt_access_secret as string,
+        '10m',
+    );
+
+    // Generate reset password URL and send it to user Email
+    const resetLink = `${config.reset_password_ui_link}?id=${user.id}&token=${passwordResetToken}`;
+    sendEmail(user.email, resetLink);
+
+    return null;
+};
+
 export const authServices = {
     loginUser,
     changeUserPassword,
     refreshToken,
+    forgetPassword,
 };

@@ -15,6 +15,11 @@ const userSchema = new Schema<TUser, UserModel>(
             required: [true, 'Password is required'],
             select: 0,
         },
+        email: {
+            type: String,
+            required: [true, 'Email is required'],
+            unique: true,
+        },
         passwordChangedAt: { type: Date },
         needsPasswordChange: { type: Boolean, default: true },
         isDeleted: { type: Boolean, default: false },
@@ -64,7 +69,7 @@ userSchema.statics.isPasswordMatched = async function (
     return await bcrypt.compare(passwordFromReq, passwordInDB);
 };
 
-//
+// Check if JWT Token issued before before password changed
 userSchema.statics.isJWTIssuedBeforePasswordChanged = function (
     passwordChangedTimeStamp: Date,
     jwtIssuedTimeStamp: number,

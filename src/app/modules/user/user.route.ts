@@ -8,20 +8,20 @@ import { adminValidators } from '../admin/admin.validation';
 const router = express.Router();
 
 router
-  .post(
-    '/create-student',
-    validateRequest(studentValidators.createStudentValidationSchema),
-    userControllers.createStudent,
-  )
-  .post(
-    '/create-faculty',
-    validateRequest(facultyValidators.createFacultyValidationSchema),
-    userControllers.createFaculty,
-  )
-  .post(
-    '/create-admin',
-    validateRequest(adminValidators.createFacultyValidationSchema),
-    userControllers.createAdmin,
-  );
+    .post(
+        '/create-student',
+        validateRequest(studentValidators.createStudentValidationSchema),
+        userControllers.createStudent,
+    )
+    .post(
+        '/create-faculty',
+        validateRequest(facultyValidators.createFacultyValidationSchema),
+        userControllers.createFaculty,
+    )
+    .post(
+        '/create-admin',
+        validateRequest(adminValidators.createAdminValidationSchema),
+        userControllers.createAdmin,
+    );
 
 export const userRoutes = router;
