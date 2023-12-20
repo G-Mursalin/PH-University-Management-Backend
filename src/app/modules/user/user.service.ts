@@ -18,9 +18,14 @@ import {
 import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
 import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 // Create Student
-const createStudent = async (password: string, student: TStudent) => {
+const createStudent = async (
+    file: any,
+    password: string,
+    student: TStudent,
+) => {
     // Find Academic Semester Information
     const admissionSemester = await AcademicSemester.findById(
         student.admissionSemester,
@@ -58,10 +63,18 @@ const createStudent = async (password: string, student: TStudent) => {
             throw new AppError(httpStatus.BAD_REQUEST, 'Fail to create user');
         }
 
+        // Upload image to Cloudinary
+        const imageName = `${newUser[0].id}-${student.name.firstName}-${student.name.lastName}`;
+        const { secure_url } = await sendImageToCloudinary(
+            imageName,
+            file.path,
+        );
+
         // Make student data
         student.id = newUser[0].id;
         student.user = newUser[0]._id;
-        // console.log(student);
+        student.profileImage = secure_url;
+
         // Create a student (Transaction 2)
         const newStudent = await Student.create([student], { session });
 
