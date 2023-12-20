@@ -17,6 +17,7 @@ import {
 } from './user.utils';
 import { TAdmin } from '../admin/admin.interface';
 import { Admin } from '../admin/admin.model';
+import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 
 // Create Student
 const createStudent = async (password: string, student: TStudent) => {
@@ -27,6 +28,15 @@ const createStudent = async (password: string, student: TStudent) => {
 
     if (!admissionSemester) {
         throw new AppError(404, 'This admission semester is not exists');
+    }
+
+    // Find Academic Department
+    const academicDepartment = await AcademicDepartment.findById(
+        student.academicDepartment,
+    );
+
+    if (!academicDepartment) {
+        throw new AppError(404, 'This department is not exists');
     }
 
     const session = await mongoose.startSession();
@@ -168,8 +178,46 @@ const createAdmin = async (password: string, admin: TAdmin) => {
     }
 };
 
+// Get me
+const getMe = async (userId: string, role: string) => {
+    let result = null;
+    if (role === 'student') {
+        result = await Student.findOne({ id: userId }).populate('user');
+    }
+    if (role === 'admin') {
+        result = await Admin.findOne({ id: userId }).populate('user');
+    }
+
+    if (role === 'faculty') {
+        result = await Faculty.findOne({ id: userId }).populate('user');
+    }
+
+    return result;
+};
+
+// Change User Status
+const changeStatus = async (id: string, status: string) => {
+    // Check if the user exists
+    const isUserExists = await User.findById(id);
+
+    if (!isUserExists) {
+        throw new AppError(httpStatus.NOT_FOUND, 'User Not Found');
+    }
+
+    const result = await User.findByIdAndUpdate(
+        id,
+        { status },
+        {
+            new: true,
+            runValidators: true,
+        },
+    );
+    return result;
+};
 export const userServices = {
     createStudent,
     createFaculty,
     createAdmin,
+    getMe,
+    changeStatus,
 };
