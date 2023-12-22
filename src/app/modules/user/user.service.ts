@@ -197,6 +197,7 @@ const getMe = async (userId: string, role: string) => {
     if (role === 'student') {
         result = await Student.findOne({ id: userId }).populate('user');
     }
+
     if (role === 'admin') {
         result = await Admin.findOne({ id: userId }).populate('user');
     }
@@ -227,6 +228,7 @@ const changeStatus = async (id: string, status: string) => {
     );
     return result;
 };
+
 export const userServices = {
     createStudent,
     createFaculty,

@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import { v2 as cloudinary } from 'cloudinary';
 import config from '../config';
 import multer from 'multer';
@@ -10,7 +11,11 @@ cloudinary.config({
     api_secret: config.cloudinary_api_secret,
 });
 
-export const sendImageToCloudinary = (imagName: string, path: string) => {
+// Send image to cloudinary
+export const sendImageToCloudinary = (
+    imagName: string,
+    path: string,
+): Promise<any> => {
     return new Promise((resolve, reject) => {
         cloudinary.uploader.upload(
             path,
@@ -18,21 +23,23 @@ export const sendImageToCloudinary = (imagName: string, path: string) => {
             function (error, result) {
                 if (error) {
                     reject(error);
+                } else {
+                    resolve(result);
+                    // Delete the file after upload file to cloudinary
+                    fs.unlink(path, (err) => {
+                        if (err) {
+                            reject(err);
+                        } else {
+                            console.log('File is deleted');
+                        }
+                    });
                 }
-                resolve(result);
-                // Delete the file after upload file to cloudinary
-                fs.unlink(path, (err) => {
-                    if (err) {
-                        reject(err);
-                    } else {
-                        console.log('File is deleted');
-                    }
-                });
             },
         );
     });
 };
 
+// Store file to Upload folder
 const storage = multer.diskStorage({
     destination: function (req, file, cb) {
         cb(null, process.cwd() + '/uploads/');

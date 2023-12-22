@@ -3,6 +3,7 @@ import catchAsync from '../../utils/catchAsync';
 import { authServices } from './auth.service';
 import sendResponse from '../../utils/sendResponse';
 import config from '../../config';
+import AppError from '../../errors/AppError';
 
 const loginUser = catchAsync(async (req, res) => {
     const result = await authServices.loginUser(req.body);
@@ -54,7 +55,7 @@ const forgetPassword = catchAsync(async (req, res) => {
     sendResponse(res, {
         success: true,
         statusCode: httpStatus.OK,
-        message: 'Password reset link send to email successfully!',
+        message: 'Password reset link send to our email successfully!',
         data: result,
     });
 });
@@ -62,6 +63,10 @@ const forgetPassword = catchAsync(async (req, res) => {
 const resetPassword = catchAsync(async (req, res) => {
     const token = req.headers.authorization;
 
+    // Check if the token send from client
+    if (!token) {
+        throw new AppError(httpStatus.UNAUTHORIZED, 'You are not authorize!');
+    }
     const result = await authServices.resetPassword(req.body, token);
 
     sendResponse(res, {

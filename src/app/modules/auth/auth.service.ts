@@ -5,7 +5,7 @@ import AppError from '../../errors/AppError';
 import { User } from '../user/user.model';
 import { TLoginUser } from './auth.interface';
 import config from '../../config';
-import { createToken } from './auth.utils';
+import { createToken, resetPasswordEmailHTMLTemplate } from './auth.utils';
 import { sendEmail } from '../../utils/sendEmail';
 
 const loginUser = async (payload: TLoginUser) => {
@@ -183,9 +183,10 @@ const forgetPassword = async (id: string) => {
         '10m',
     );
 
-    // Generate reset password URL and send it to user Email
+    // Generate reset password URL, HTML Template and send it to user Email
     const resetLink = `${config.reset_password_ui_link}?id=${user.id}&token=${passwordResetToken}`;
-    sendEmail(user.email, resetLink);
+    const htmlForResetPasswordEmail = resetPasswordEmailHTMLTemplate(resetLink);
+    sendEmail(user.email, htmlForResetPasswordEmail);
 
     return null;
 };
