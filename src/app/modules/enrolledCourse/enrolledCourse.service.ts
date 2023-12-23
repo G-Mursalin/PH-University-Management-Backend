@@ -8,6 +8,7 @@ import { SemesterRegistration } from '../semesterRegistration/semesterRegistrati
 import { Course } from '../course/course.model';
 import { TEnrolledCourse } from './enrolledCourse.interface';
 import { Faculty } from '../faculty/faculty.model';
+import { calculateGradeAndPoints } from './enrolledCourse.utils';
 
 const createEnrolledCourse = async (userId: string, payload: string) => {
     // Check if the offered course exists
@@ -213,6 +214,23 @@ const updateEnrolledCourseMarks = async (
     // Now update the course
     const modifiedData: Record<string, unknown> = {};
 
+    if (courseMarks?.finalTerm) {
+        const { classTest1, classTest2, midTerm, finalTerm } =
+            isCourseBelongToFaculty.courseMarks;
+
+        const totalMarks =
+            Math.ceil(classTest1 * 0.1) +
+            Math.ceil(midTerm * 0.3) +
+            Math.ceil(classTest2 * 0.1) +
+            Math.ceil(finalTerm * 0.5);
+
+        const { grade, gradePoints } = calculateGradeAndPoints(totalMarks);
+
+        modifiedData.grade = grade;
+        modifiedData.gradePoints = gradePoints;
+        modifiedData.isCompleted = true;
+    }
+
     if (courseMarks && Object.keys(courseMarks).length) {
         for (const [key, value] of Object.entries(courseMarks)) {
             modifiedData[`courseMarks.${key}`] = value;
@@ -224,6 +242,7 @@ const updateEnrolledCourseMarks = async (
         modifiedData,
         {
             new: true,
+            runValidators: true,
         },
     );
 
