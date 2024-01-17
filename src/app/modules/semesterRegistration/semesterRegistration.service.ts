@@ -46,7 +46,7 @@ const createSemesterRegistration = async (
 
     if (isSemesterRegistrationExists) {
         throw new AppError(
-            httpStatus.NOT_FOUND,
+            httpStatus.CONFLICT,
             'This Semester is already registered!',
         );
     }
