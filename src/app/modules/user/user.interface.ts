@@ -10,7 +10,7 @@ export interface TUser {
     needsPasswordChange: boolean;
     isDeleted: boolean;
     status: 'in-progress' | 'blocked';
-    role: 'admin' | 'student' | 'faculty';
+    role: 'superAdmin' | 'admin' | 'student' | 'faculty';
 }
 
 export interface UserModel extends Model<TUser> {
