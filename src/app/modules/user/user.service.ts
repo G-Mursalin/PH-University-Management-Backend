@@ -63,17 +63,19 @@ const createStudent = async (
             throw new AppError(httpStatus.BAD_REQUEST, 'Fail to create user');
         }
 
-        // Upload image to Cloudinary
-        const imageName = `${newUser[0].id}-${student.name.firstName}-${student.name.lastName}`;
-        const { secure_url } = await sendImageToCloudinary(
-            imageName,
-            file.path,
-        );
+        //If user send file then Upload image to Cloudinary
+        const imageName = file
+            ? `${newUser[0].id}-${student.name.firstName}-${student.name.lastName}`
+            : '';
+        const { secure_url } = file
+            ? await sendImageToCloudinary(imageName, file.path)
+            : '';
 
         // Make student data
         student.id = newUser[0].id;
         student.user = newUser[0]._id;
         student.profileImage = secure_url;
+        student.academicFaculty = academicDepartment.academicFaculty;
 
         // Create a student (Transaction 2)
         const newStudent = await Student.create([student], { session });
