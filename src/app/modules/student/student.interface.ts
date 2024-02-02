@@ -54,19 +54,7 @@ export type TStudent = {
     academicFaculty: Types.ObjectId;
 };
 
-// **************Instance Methods
-
-// export type TStudentMethod = {
-//   isUserExists(id: string): Promise<TStudent | null>;
-// };
-
-// export type StudentModel = Model<
-//   TStudent,
-//   Record<string, never>,
-//   TStudentMethod
-// >;
-
-// ***********************Static Methods
+// Static Methods
 export interface StudentModelStaticMethod extends Model<TStudent> {
     // eslint-disable-next-line no-unused-vars
     isUserExists(id: string): Promise<TStudent | null>;

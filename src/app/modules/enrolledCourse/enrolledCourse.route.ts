@@ -18,11 +18,16 @@ router
     )
     .patch(
         '/update-enrolled-course-marks',
-        auth(USER_ROLE.faculty),
+        auth(USER_ROLE.faculty, USER_ROLE.superAdmin, USER_ROLE.admin),
         validateRequest(
             enrolledCourseValidators.updateEnrolledCourseMarksValidationZodSchema,
         ),
         enrolledCourseControllers.updateEnrolledCourseMarks,
+    )
+    .get(
+        '/my-enrolled-courses',
+        auth(USER_ROLE.student),
+        enrolledCourseControllers.getMyEnrolledCourses,
     );
 
 export const enrolledCourseRoutes = router;

@@ -25,24 +25,29 @@ router
     )
     .post(
         '/create-faculty',
-        auth(USER_ROLE.admin),
+        auth(USER_ROLE.superAdmin, USER_ROLE.admin),
         validateRequest(facultyValidators.createFacultyValidationSchema),
         userControllers.createFaculty,
     )
     .post(
         '/create-admin',
-        // auth(USER_ROLE.admin),
+        auth(USER_ROLE.superAdmin, USER_ROLE.admin),
         validateRequest(adminValidators.createAdminValidationSchema),
         userControllers.createAdmin,
     )
     .get(
         '/get-me',
-        auth(USER_ROLE.admin, USER_ROLE.faculty, USER_ROLE.student),
+        auth(
+            USER_ROLE.superAdmin,
+            USER_ROLE.admin,
+            USER_ROLE.faculty,
+            USER_ROLE.student,
+        ),
         userControllers.getMe,
     )
     .post(
         '/change-status/:id',
-        auth(USER_ROLE.admin),
+        auth(USER_ROLE.superAdmin, USER_ROLE.admin),
         validateRequest(userValidators.changeStatusValidationSchema),
         userControllers.changeStatus,
     );

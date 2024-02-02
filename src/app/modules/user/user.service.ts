@@ -1,24 +1,24 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
+import httpStatus from 'http-status';
 import mongoose from 'mongoose';
 import config from '../../config';
+import AppError from '../../errors/AppError';
+import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
+import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
 import { AcademicSemester } from '../academicSemester/academicSemester.model';
+import { TAdmin } from '../admin/admin.interface';
+import { Admin } from '../admin/admin.model';
+import { TFaculty } from '../faculty/faculty.interface';
+import { Faculty } from '../faculty/faculty.model';
 import { TStudent } from '../student/student.interface';
 import { Student } from '../student/student.model';
 import { TUser } from './user.interface';
 import { User } from './user.model';
-import AppError from '../../errors/AppError';
-import httpStatus from 'http-status';
-import { TFaculty } from '../faculty/faculty.interface';
-import { Faculty } from '../faculty/faculty.model';
 import {
+    generateAdminID,
     generateFacultyID,
     generateStudentID,
-    generateAdminID,
 } from './user.utils';
-import { TAdmin } from '../admin/admin.interface';
-import { Admin } from '../admin/admin.model';
-import { AcademicDepartment } from '../academicDepartment/academicDepartment.model';
-import { sendImageToCloudinary } from '../../utils/sendImageToCloudinary';
 
 // Create Student
 const createStudent = async (
@@ -101,6 +101,18 @@ const createStudent = async (
 
 // Create Faculty
 const createFaculty = async (password: string, faculty: TFaculty) => {
+    // Check if the academicDepartment Exists
+    const isAcademicDepartmentExists = await AcademicDepartment.findById(
+        faculty.academicDepartment,
+    );
+    if (!isAcademicDepartmentExists) {
+        throw new AppError(
+            httpStatus.BAD_REQUEST,
+            'Academic Department is not exists',
+        );
+    }
+
+    // Start Transaction
     const session = await mongoose.startSession();
     try {
         session.startTransaction();
@@ -123,6 +135,7 @@ const createFaculty = async (password: string, faculty: TFaculty) => {
         // Make Faculty data
         faculty.id = newUser[0].id;
         faculty.user = newUser[0]._id;
+        faculty.academicFaculty = isAcademicDepartmentExists.academicFaculty;
 
         // Create a student (Transaction 2)
         const newFaculty = await Faculty.create([faculty], { session });

@@ -1,25 +1,45 @@
 import { z } from 'zod';
 import { BloodGroup, Gender } from './admin.constant';
 
-//********Create Validation
+// Create Validation
 const createNameValidationSchema = z.object({
-    firstName: z.string(),
-    // .refine(
-    //   (data) =>
-    //     data.trim().length > 0 &&
-    //     data.length <= 20 &&
-    //     /^[A-Z][a-z]*$/.test(data),
-    //   {
-    //     message:
-    //       'First name must be capitalized and have at most 20 characters',
-    //   },
-    // ),
-    middleName: z.string(),
+    firstName: z
+        .string()
+        .refine(
+            (data) =>
+                data.trim().length > 0 &&
+                data.length <= 20 &&
+                /^[A-Z][a-z]*$/.test(data),
+            {
+                message:
+                    'First name must be capitalized, can not contain any number or spacial character and have maximum 20 characters',
+            },
+        ),
+    middleName: z
+        .string()
+        .refine(
+            (data) =>
+                data.trim().length > 0 &&
+                data.length <= 20 &&
+                /^[A-Z][a-z]*$/.test(data),
+            {
+                message:
+                    'Middle name must be capitalized, can not contain any number or spacial character and have maximum 20 characters',
+            },
+        )
+        .optional(),
     lastName: z
         .string()
-        .refine((data) => data.length > 0 && /^[A-Za-z]+$/.test(data), {
-            message: 'Last name must contain only letters',
-        }),
+        .refine(
+            (data) =>
+                data.trim().length > 0 &&
+                data.length <= 20 &&
+                /^[A-Z][a-z]*$/.test(data),
+            {
+                message:
+                    'Last name must be capitalized, can not contain any number or spacial character and have maximum 20 characters',
+            },
+        ),
 });
 
 const createAdminValidationSchema = z.object({
@@ -46,25 +66,46 @@ const createAdminValidationSchema = z.object({
     }),
 });
 
-//********Update Validation
+// Update Validation
 const updateNameValidationSchema = z.object({
-    firstName: z.string().optional(),
-    // .refine(
-    //   (data) =>
-    //     data.trim().length > 0 &&
-    //     data.length <= 20 &&
-    //     /^[A-Z][a-z]*$/.test(data),
-    //   {
-    //     message:
-    //       'First name must be capitalized and have at most 20 characters',
-    //   },
-    // ),
-    middleName: z.string().optional(),
+    firstName: z
+        .string()
+        .refine(
+            (data) =>
+                data.trim().length > 0 &&
+                data.length <= 20 &&
+                /^[A-Z][a-z]*$/.test(data),
+            {
+                message:
+                    'First name must be capitalized, can not contain any number or spacial character and have maximum 20 characters',
+            },
+        )
+        .optional(),
+    middleName: z
+        .string()
+        .refine(
+            (data) =>
+                data.trim().length > 0 &&
+                data.length <= 20 &&
+                /^[A-Z][a-z]*$/.test(data),
+            {
+                message:
+                    'Middle name must be capitalized, can not contain any number or spacial character and have maximum 20 characters',
+            },
+        )
+        .optional(),
     lastName: z
         .string()
-        .refine((data) => data.length > 0 && /^[A-Za-z]+$/.test(data), {
-            message: 'Last name must contain only letters',
-        })
+        .refine(
+            (data) =>
+                data.trim().length > 0 &&
+                data.length <= 20 &&
+                /^[A-Z][a-z]*$/.test(data),
+            {
+                message:
+                    'Last name must be capitalized, can not contain any number or spacial character and have maximum 20 characters',
+            },
+        )
         .optional(),
 });
 

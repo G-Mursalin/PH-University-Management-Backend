@@ -9,7 +9,9 @@ import { Course } from '../course/course.model';
 import { TEnrolledCourse } from './enrolledCourse.interface';
 import { Faculty } from '../faculty/faculty.model';
 import { calculateGradeAndPoints } from './enrolledCourse.utils';
+import QueryBuilder from '../../builder/QueryBuilder';
 
+// Create Enrolled Courses
 const createEnrolledCourse = async (userId: string, payload: string) => {
     // Check if the offered course exists
     const isOfferedCourseExists = await OfferedCourse.findById(payload);
@@ -157,6 +159,7 @@ const createEnrolledCourse = async (userId: string, payload: string) => {
     }
 };
 
+// Update Enrolled Course Marks
 const updateEnrolledCourseMarks = async (
     facultyId: string,
     payload: Partial<TEnrolledCourse>,
@@ -219,10 +222,10 @@ const updateEnrolledCourseMarks = async (
             isCourseBelongToFaculty.courseMarks;
 
         const totalMarks =
-            Math.ceil(classTest1 * 0.1) +
-            Math.ceil(midTerm * 0.3) +
-            Math.ceil(classTest2 * 0.1) +
-            Math.ceil(finalTerm * 0.5);
+            Math.ceil(classTest1) +
+            Math.ceil(midTerm) +
+            Math.ceil(classTest2) +
+            Math.ceil(finalTerm);
 
         const { grade, gradePoints } = calculateGradeAndPoints(totalMarks);
 
@@ -249,7 +252,39 @@ const updateEnrolledCourseMarks = async (
     return result;
 };
 
+// Get My All Enrolled
+const getMyEnrolledCourses = async (
+    studentId: string,
+    query: Record<string, unknown>,
+) => {
+    const student = await Student.findOne({ id: studentId });
+
+    if (!student) {
+        throw new AppError(httpStatus.NOT_FOUND, 'Student not found!');
+    }
+
+    const enrolledCourseQuery = new QueryBuilder(
+        EnrolledCourse.find({ student: student._id }).populate(
+            'semesterRegistration academicSemester academicFaculty academicDepartment offeredCourse course student faculty',
+        ),
+        query,
+    )
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
+
+    const result = await enrolledCourseQuery.modelQuery;
+    const meta = await enrolledCourseQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
+};
+
 export const enrolledCourseServices = {
     createEnrolledCourse,
     updateEnrolledCourseMarks,
+    getMyEnrolledCourses,
 };
