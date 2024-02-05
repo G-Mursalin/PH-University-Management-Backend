@@ -63,7 +63,7 @@ const createStudent = async (
             throw new AppError(httpStatus.BAD_REQUEST, 'Fail to create user');
         }
 
-        //If user send file then Upload image to Cloudinary
+        //If user send image file then Upload image to Cloudinary
         const imageName = file
             ? `${newUser[0].id}-${student.name.firstName}-${student.name.lastName}`
             : '';
@@ -100,7 +100,11 @@ const createStudent = async (
 };
 
 // Create Faculty
-const createFaculty = async (password: string, faculty: TFaculty) => {
+const createFaculty = async (
+    file: any,
+    password: string,
+    faculty: TFaculty,
+) => {
     // Check if the academicDepartment Exists
     const isAcademicDepartmentExists = await AcademicDepartment.findById(
         faculty.academicDepartment,
@@ -132,9 +136,18 @@ const createFaculty = async (password: string, faculty: TFaculty) => {
             throw new AppError(httpStatus.BAD_REQUEST, 'Fail to create user');
         }
 
+        //If user send image file then Upload image to Cloudinary
+        const imageName = file
+            ? `${newUser[0].id}-${faculty.name.firstName}-${faculty.name.lastName}`
+            : '';
+        const { secure_url } = file
+            ? await sendImageToCloudinary(imageName, file.path)
+            : '';
+
         // Make Faculty data
         faculty.id = newUser[0].id;
         faculty.user = newUser[0]._id;
+        faculty.profileImage = secure_url;
         faculty.academicFaculty = isAcademicDepartmentExists.academicFaculty;
 
         // Create a student (Transaction 2)
@@ -160,7 +173,7 @@ const createFaculty = async (password: string, faculty: TFaculty) => {
 };
 
 // Create Admin
-const createAdmin = async (password: string, admin: TAdmin) => {
+const createAdmin = async (file: any, password: string, admin: TAdmin) => {
     const session = await mongoose.startSession();
     try {
         session.startTransaction();
@@ -180,11 +193,20 @@ const createAdmin = async (password: string, admin: TAdmin) => {
             throw new AppError(httpStatus.BAD_REQUEST, 'Fail to create user');
         }
 
-        // Make Faculty data
+        //If user send image file then Upload image to Cloudinary
+        const imageName = file
+            ? `${newUser[0].id}-${admin.name.firstName}-${admin.name.lastName}`
+            : '';
+        const { secure_url } = file
+            ? await sendImageToCloudinary(imageName, file.path)
+            : '';
+
+        // Make Admin data
         admin.id = newUser[0].id;
         admin.user = newUser[0]._id;
+        admin.profileImage = secure_url;
 
-        // Create a student (Transaction 2)
+        // Create a Admin (Transaction 2)
         const newFaculty = await Admin.create([admin], { session });
 
         if (!newFaculty.length) {
