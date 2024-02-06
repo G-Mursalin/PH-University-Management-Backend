@@ -11,70 +11,88 @@ import {
 import validator from 'validator';
 import { BloodGroup, Gender } from './student.constant';
 
-const nameSchema = new Schema<TUserName>({
-    firstName: {
-        type: String,
-        trim: true,
-        required: [true, 'First name is required'],
-        maxlength: [20, 'Max allowed length 20'],
-        validate: {
-            validator: function (value: string) {
-                const firstNameStr =
-                    value.charAt(0).toUpperCase() + value.slice(1);
-                return firstNameStr === value;
+const nameSchema = new Schema<TUserName>(
+    {
+        firstName: {
+            type: String,
+            trim: true,
+            required: [true, 'First name is required'],
+            maxlength: [20, 'Max allowed length 20'],
+            validate: {
+                validator: function (value: string) {
+                    const firstNameStr =
+                        value.charAt(0).toUpperCase() + value.slice(1);
+                    return firstNameStr === value;
+                },
+                message: '{VALUE} is not capitalize format',
             },
-            message: '{VALUE} is not capitalize format',
+        },
+        middleName: { type: String },
+        lastName: {
+            type: String,
+            required: [true, 'Last name is required'],
+            validate: {
+                validator: function (value: string) {
+                    return validator.isAlpha(value);
+                },
+                message: '{VALUE} is not value',
+            },
         },
     },
-    middleName: { type: String },
-    lastName: {
-        type: String,
-        required: [true, 'Last name is required'],
-        validate: {
-            validator: function (value: string) {
-                return validator.isAlpha(value);
-            },
-            message: '{VALUE} is not value',
+    { _id: false },
+);
+
+const guardianSchema = new Schema<TGuardian>(
+    {
+        fatherName: {
+            type: String,
+            required: [true, 'Father name is required'],
+        },
+        fatherOccupation: {
+            type: String,
+            required: [true, 'Father occupation is required'],
+        },
+        fatherContactNo: {
+            type: String,
+            required: [true, 'Father contact number is required'],
+        },
+        motherName: {
+            type: String,
+            required: [true, 'Mother name is required'],
+        },
+        motherOccupation: {
+            type: String,
+            required: [true, 'Mother occupation is required'],
+        },
+        motherContactNo: {
+            type: String,
+            required: [true, 'Mother contact number is required'],
         },
     },
-});
+    { _id: false },
+);
 
-const guardianSchema = new Schema<TGuardian>({
-    fatherName: { type: String, required: [true, 'Father name is required'] },
-    fatherOccupation: {
-        type: String,
-        required: [true, 'Father occupation is required'],
+const localGuardianSchema = new Schema<TLocalGuardian>(
+    {
+        name: {
+            type: String,
+            required: [true, 'Local guardian name is required'],
+        },
+        occupation: {
+            type: String,
+            required: [true, 'Local guardian occupation is required'],
+        },
+        contactNo: {
+            type: String,
+            required: [true, 'Local guardian contact number is required'],
+        },
+        address: {
+            type: String,
+            required: [true, 'Local guardian address is required'],
+        },
     },
-    fatherContactNo: {
-        type: String,
-        required: [true, 'Father contact number is required'],
-    },
-    motherName: { type: String, required: [true, 'Mother name is required'] },
-    motherOccupation: {
-        type: String,
-        required: [true, 'Mother occupation is required'],
-    },
-    motherContactNo: {
-        type: String,
-        required: [true, 'Mother contact number is required'],
-    },
-});
-
-const localGuardianSchema = new Schema<TLocalGuardian>({
-    name: { type: String, required: [true, 'Local guardian name is required'] },
-    occupation: {
-        type: String,
-        required: [true, 'Local guardian occupation is required'],
-    },
-    contactNo: {
-        type: String,
-        required: [true, 'Local guardian contact number is required'],
-    },
-    address: {
-        type: String,
-        required: [true, 'Local guardian address is required'],
-    },
-});
+    { _id: false },
+);
 
 // *******************************************************************
 const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
@@ -197,9 +215,9 @@ const studentSchema = new Schema<TStudent, StudentModelStaticMethod>(
 // });
 
 // ********************Virtual Fields
-// studentSchema.virtual('fullName').get(function () {
-//   return `${this.name.firstName} ${this.name.lastName}`;
-// });
+studentSchema.virtual('fullName').get(function () {
+    return `${this.name.firstName} ${this.name.lastName}`;
+});
 
 // Create a Model.
 export const Student = model<TStudent, StudentModelStaticMethod>(

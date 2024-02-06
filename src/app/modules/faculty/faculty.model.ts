@@ -3,33 +3,38 @@ import { TFaculty, TFacultyName } from './faculty.interface';
 import validator from 'validator';
 import { BloodGroup, Gender } from './faculty.constant';
 
-const nameSchema = new Schema<TFacultyName>({
-    firstName: {
-        type: String,
-        trim: true,
-        required: [true, 'First name is required'],
-        maxlength: [20, 'Max allowed length 20'],
-        validate: {
-            validator: function (value: string) {
-                const firstNameStr =
-                    value.charAt(0).toUpperCase() + value.slice(1);
-                return firstNameStr === value;
+const nameSchema = new Schema<TFacultyName>(
+    {
+        firstName: {
+            type: String,
+            trim: true,
+            required: [true, 'First name is required'],
+            maxlength: [20, 'Max allowed length 20'],
+            validate: {
+                validator: function (value: string) {
+                    const firstNameStr =
+                        value.charAt(0).toUpperCase() + value.slice(1);
+                    return firstNameStr === value;
+                },
+                message: '{VALUE} is not capitalize format',
             },
-            message: '{VALUE} is not capitalize format',
+        },
+        middleName: { type: String },
+        lastName: {
+            type: String,
+            required: [true, 'Last name is required'],
+            validate: {
+                validator: function (value: string) {
+                    return validator.isAlpha(value);
+                },
+                message: '{VALUE} is not value',
+            },
         },
     },
-    middleName: { type: String },
-    lastName: {
-        type: String,
-        required: [true, 'Last name is required'],
-        validate: {
-            validator: function (value: string) {
-                return validator.isAlpha(value);
-            },
-            message: '{VALUE} is not value',
-        },
+    {
+        _id: false,
     },
-});
+);
 
 const facultySchema = new Schema<TFaculty>(
     {
@@ -109,8 +114,16 @@ const facultySchema = new Schema<TFaculty>(
     },
     {
         timestamps: true,
+        toJSON: {
+            virtuals: true,
+        },
     },
 );
+
+// ********************Virtual Fields
+facultySchema.virtual('fullName').get(function () {
+    return `${this.name.firstName} ${this.name.lastName}`;
+});
 
 // Create a Model.
 export const Faculty = model<TFaculty>('Faculty', facultySchema);
