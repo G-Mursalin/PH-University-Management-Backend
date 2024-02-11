@@ -1,7 +1,7 @@
 import { Router } from 'express';
 import validateRequest from '../../middlewares/validateRequest';
 import { academicFacultyValidators } from './academicFaculty.validation';
-import { academicFacultyControllers } from './academinFaculty.controller';
+import { academicFacultyControllers } from './academicFaculty.controller';
 import auth from '../../middlewares/auth';
 import { USER_ROLE } from '../user/user.constant';
 

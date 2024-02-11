@@ -28,6 +28,11 @@ router
         '/my-enrolled-courses',
         auth(USER_ROLE.student),
         enrolledCourseControllers.getMyEnrolledCourses,
+    )
+    .get(
+        '/enrolled-courses',
+        auth(USER_ROLE.faculty),
+        enrolledCourseControllers.getAllFacultyCourses,
     );
 
 export const enrolledCourseRoutes = router;

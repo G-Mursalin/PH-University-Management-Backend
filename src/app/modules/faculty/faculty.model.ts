@@ -122,6 +122,7 @@ const facultySchema = new Schema<TFaculty>(
 
 // ********************Virtual Fields
 facultySchema.virtual('fullName').get(function () {
+    if (!this.name) return;
     return `${this.name.firstName} ${this.name.lastName}`;
 });
 

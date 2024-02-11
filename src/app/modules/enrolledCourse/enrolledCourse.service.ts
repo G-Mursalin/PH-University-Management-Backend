@@ -283,8 +283,22 @@ const getMyEnrolledCourses = async (
     };
 };
 
+// Get All Faculty Courses(Enrolled)
+const getAllFacultyCourses = async (userId: string) => {
+    const faculty = await Faculty.findOne({ id: userId }).select({
+        _id: 1,
+    });
+
+    const courses = await EnrolledCourse.find({ faculty }).populate({
+        path: 'student',
+    });
+
+    return courses;
+};
+
 export const enrolledCourseServices = {
     createEnrolledCourse,
     updateEnrolledCourseMarks,
     getMyEnrolledCourses,
+    getAllFacultyCourses,
 };

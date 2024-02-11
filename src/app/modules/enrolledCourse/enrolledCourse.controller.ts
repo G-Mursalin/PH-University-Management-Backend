@@ -54,8 +54,23 @@ const getMyEnrolledCourses = catchAsync(async (req, res) => {
     });
 });
 
+// Get All Faculty Courses (Enrolled)
+const getAllFacultyCourses = catchAsync(async (req, res) => {
+    const { userId } = req.user;
+    const result = await enrolledCourseServices.getAllFacultyCourses(userId);
+
+    sendResponse(res, {
+        statusCode: httpStatus.OK,
+        success: true,
+        message: 'Enrolled courses are fetched successfully for this faculty',
+        meta: undefined,
+        data: result,
+    });
+});
+
 export const enrolledCourseControllers = {
     createEnrolledCourse,
     updateEnrolledCourseMarks,
     getMyEnrolledCourses,
+    getAllFacultyCourses,
 };
