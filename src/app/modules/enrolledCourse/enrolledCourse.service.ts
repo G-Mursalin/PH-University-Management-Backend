@@ -284,16 +284,32 @@ const getMyEnrolledCourses = async (
 };
 
 // Get All Faculty Courses(Enrolled)
-const getAllFacultyCourses = async (userId: string) => {
+const getAllFacultyCourses = async (
+    userId: string,
+    query: Record<string, unknown>,
+) => {
     const faculty = await Faculty.findOne({ id: userId }).select({
         _id: 1,
     });
 
-    const courses = await EnrolledCourse.find({ faculty }).populate({
-        path: 'student',
-    });
+    const enrolledCourseQuery = new QueryBuilder(
+        EnrolledCourse.find({ faculty }).populate({
+            path: 'student academicSemester semesterRegistration course offeredCourse',
+        }),
+        query,
+    )
+        .filter()
+        .sort()
+        .paginate()
+        .fields();
 
-    return courses;
+    const result = await enrolledCourseQuery.modelQuery;
+    const meta = await enrolledCourseQuery.countTotal();
+
+    return {
+        meta,
+        result,
+    };
 };
 
 export const enrolledCourseServices = {

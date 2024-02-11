@@ -57,14 +57,17 @@ const getMyEnrolledCourses = catchAsync(async (req, res) => {
 // Get All Faculty Courses (Enrolled)
 const getAllFacultyCourses = catchAsync(async (req, res) => {
     const { userId } = req.user;
-    const result = await enrolledCourseServices.getAllFacultyCourses(userId);
+    const result = await enrolledCourseServices.getAllFacultyCourses(
+        userId,
+        req.query,
+    );
 
     sendResponse(res, {
         statusCode: httpStatus.OK,
         success: true,
         message: 'Enrolled courses are fetched successfully for this faculty',
-        meta: undefined,
-        data: result,
+        meta: result.meta,
+        data: result.result,
     });
 });
 

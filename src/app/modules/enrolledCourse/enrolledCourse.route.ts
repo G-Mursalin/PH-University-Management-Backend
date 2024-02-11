@@ -30,7 +30,7 @@ router
         enrolledCourseControllers.getMyEnrolledCourses,
     )
     .get(
-        '/enrolled-courses',
+        '/',
         auth(USER_ROLE.faculty),
         enrolledCourseControllers.getAllFacultyCourses,
     );
